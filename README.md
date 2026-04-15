@@ -37,3 +37,11 @@ Only 1.87% of organizations formally tracked burnout indicators, with the overwh
 99.07% of respondents reported that strategic errors linked to leader fatigue were "not tracked," highlighting a near-complete absence of fatigue-impact visibility at the organizational level
 Constructed an index-based scoring framework that converts subjective survey perceptions into four consistent, comparable wellness metrics suitable for cross-organizational benchmarking
 Delivered an executive Power BI dashboard surfacing response distributions, risk zone classifications, and maturity levels across all four leadership energy dimensions
+
+🗂️ How to Navigate the Repo
+📁 My-First_project/
+│
+├── 📄 README.md                   ← You are here
+│
+├── 📁 Python Code/
+│   └── Contains the full code with statistical output.
