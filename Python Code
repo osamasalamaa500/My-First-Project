@@ -1,0 +1,150 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+!pip install openpyxl
+df = pd.read_excel(r"C:\Somayeh\2\Capstone\Assignments\Group\Clean Dataset 2.xlsx")
+df.head()
+df.info()
+df.dtypes
+import pandas as pd
+
+# Clean all string columns thoroughly
+for col in df.select_dtypes(include='object').columns:
+    df[col] = df[col].astype(str)  # ensure everything is string
+    df[col] = df[col].str.replace(r'[\s\xa0]+', ' ', regex=True)  # replace all whitespace/non-breaking spaces with normal space
+    df[col] = df[col].str.strip()  # remove leading/trailing spaces
+    df[col] = df[col].replace({'': pd.NA, 'Not tracked': pd.NA})  # optional: convert empty/Not tracked to NaN
+
+for col in ['Q5_experience years', 'Q7_energy', 'Q8_leadership_confidence', 'Q9_tracking', 'Q11_fatigue_impact']:
+    print(col, df[col].unique())
+
+import pandas as pd
+
+
+# Function to generate frequency tables
+# -------------------------------
+def generate_distribution(df, column_name):
+    """
+    Returns frequency table (count + percentage) for a column, ignoring NaN values
+    """
+    series_clean = df[column_name].dropna()
+    
+    count = series_clean.value_counts()
+    percentage = series_clean.value_counts(normalize=True) * 100
+    mode = series_clean.mode()
+    
+    summary = pd.DataFrame({'Count': count, 'Percentage (%)': percentage.round(2)})
+    
+    print(f"\n📊 Distribution for: {column_name}\n{'='*50}")
+    print(summary.to_string())
+    print("\nMode:", mode.tolist())
+    
+    return summary
+
+# -------------------------------
+# List of survey columns
+# -------------------------------
+survey_columns = ['Q5_experience years', 'Q7_energy', 
+                  'Q8_leadership_confidence', 'Q9_tracking', 'Q11_fatigue_impact']
+
+# -------------------------------
+# Generate frequency tables for all questions
+# -------------------------------
+distribution_tables = {}
+for col in survey_columns:
+    distribution_tables[col] = generate_distribution(df, col)
+
+import pandas as pd
+import statsmodels.api as sm
+
+# Encode Q5 as numeric
+experience_map = {"< 3 years": 1, "3–7 years": 2, "7–15 years": 3, "15+ years": 4}
+df['Q5_num'] = df['Q5_experience years'].map(experience_map)
+
+# Encode Q8 as numeric
+confidence_map = {
+    "Highly concerned — burnout is already present": 1,
+    "Not confident": 2,
+    "Unsure": 3,
+    "Somewhat confident": 4,
+    "Very confident": 5
+}
+df['Q8_num'] = df['Q8_leadership_confidence'].map(confidence_map)
+
+# Define predictor (X) and response (y)
+X = df[['Q5_num']]  # Independent variable
+y = df['Q8_num']    # Dependent variable
+
+# Add constant for statsmodels
+X = sm.add_constant(X)
+
+# Fit linear regression
+model = sm.OLS(y, X).fit()
+print(model.summary())
+import pandas as pd
+import statsmodels.api as sm
+
+# Encode Q5 as numeric
+experience_map = {"< 3 years": 1, "3–7 years": 2, "7–15 years": 3, "15+ years": 4}
+df['Q5_num'] = df['Q5_experience years'].map(experience_map)
+
+# Encode Q7_energy
+df['Q7_num'] = df['Q7_energy'].map({
+    'Not sure — we don’t measure this': 0,
+    '20% sustainable / 80% exhaustion': 1,
+    '40% sustainable / 60% exhaustion': 2,
+    '60% sustainable / 40% exhaustion': 3
+})
+
+# Define predictor (X) and response (y)
+X = df[['Q5_num']]  # Independent variable
+y = df['Q7_num']    # Dependent variable
+
+# Add constant for statsmodels
+X = sm.add_constant(X)
+
+# Fit linear regression
+model = sm.OLS(y, X).fit()
+print(model.summary())
+import pandas as pd
+import statsmodels.api as sm
+
+# Encode Q5 as numeric
+experience_map = {"< 3 years": 1, "3–7 years": 2, "7–15 years": 3, "15+ years": 4}
+df['Q5_num'] = df['Q5_experience years'].map(experience_map)
+
+# Encode Q11_fatigue_impact (only 1 value is meaningful, rest is 'Not tracked')
+df['Q11_num'] = df['Q11_fatigue_impact'].map({
+    'Not tracked': 0,
+    '25–50%': 1
+})
+
+# Define predictor (X) and response (y)
+X = df[['Q5_num']]  # Independent variable
+y = df['Q11_num']    # Dependent variable
+
+# Add constant for statsmodels
+X = sm.add_constant(X)
+
+# Fit linear regression
+model = sm.OLS(y, X).fit()
+print(model.summary())
+import matplotlib.pyplot as plt
+
+col1 = df.iloc[:, 0]
+
+# Get counts
+counts = col1.value_counts()
+
+# Create pie chart
+plt.figure(figsize=(7,7))
+plt.pie(
+    counts,
+    labels=counts.index,
+    autopct='%1.1f%%',
+    startangle=140
+)
+
+plt.title(df.columns[0])
+plt.tight_layout()
+plt.show()
